@@ -1,0 +1,58 @@
+# Dockerfile
+
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
+
+# Set environment variables for Go build
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
+# Set the working directory
+WORKDIR /app
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    git \
+    build-essential \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install DeepSpeech
+RUN pip install deepspeech
+
+# Download pre-trained English model files
+RUN wget -q https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm \
+    && wget -q https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer
+
+# Move the models to a known directory
+RUN mkdir -p /opt/deepspeech \
+    && mv deepspeech-0.9.3-models.pbmm /opt/deepspeech/ \
+    && mv deepspeech-0.9.3-models.scorer /opt/deepspeech/
+
+# Install Golang (if needed, adjust version)
+RUN wget -q https://golang.org/dl/go1.22.4.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz \
+    && rm go1.22.4.linux-amd64.tar.gz
+
+# Set Go environment variables
+ENV PATH=$PATH:/usr/local/go/bin \
+    GOPATH=/go
+
+# Install Fresh
+RUN go install github.com/pilu/fresh@latest
+
+# Copy the Go application source code into the container
+COPY . .
+
+# Install Go dependencies
+RUN go mod download
+
+# Compile the Go application
+RUN go build -o /usr/local/bin/app ./cmd/api
+
+# Set up the entry point to run the Go application with Fresh for live reload
+CMD if [ "$WATCH_FILES" == "1" ]; then fresh; else /usr/local/bin/app; fi

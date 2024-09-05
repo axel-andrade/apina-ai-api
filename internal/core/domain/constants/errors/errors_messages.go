@@ -1,0 +1,26 @@
+package err_msg
+
+const (
+	INCORRECT_PASSWORD         = "incorrect password"
+	INVALID_EMAIL              = "invalid email"
+	INVALID_NAME               = "invalid name"
+	INVALID_PASSWORD           = "invalid password"
+	INVALID_KIND               = "invalid kind"
+	NAME_IS_EMPTY              = "name is empty"
+	DESCRIPTION_IS_EMPTY       = "description is empty"
+	KIND_IS_EMPTY              = "kind is empty"
+	LANGUAGE_IS_EMPTY          = "language is empty"
+	FILE_IS_EMPTY              = "file is empty"
+	FILENAME_IS_EMPTY          = "filename is empty"
+	TEXT_IS_EMPTY              = "text is empty"
+	CATEGORY_TYPE_MISMATCH     = "category type does not match transaction type"
+	USER_NOT_FOUND             = "user not found"
+	CONTENT_NOT_FOUND          = "content not found"
+	USER_ALREADY_EXISTS        = "user already exists"
+	CONTENT_ALREADY_PROCESSED  = "content already processed"
+	UNAUTHORIZED               = "unauthorized"
+	INTERNAL_SERVER_ERROR      = "internal server error"
+	CONTACT_FULL_NAME_REQUIRED = "full name is required"
+	CONTACT_CELLPHONE_REQUIRED = "cellphone is required"
+	INVALID_CELLPHONE          = "The cellphone number should be in the format +55 11 99999-9999"
+)

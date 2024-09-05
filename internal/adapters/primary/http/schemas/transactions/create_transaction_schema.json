@@ -1,0 +1,54 @@
+{
+    "$id": "create_transaction",
+    "type": "object",
+    "properties": {
+        "body": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "type": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "enum": [
+                        "expense",
+                        "income"
+                    ]
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "amount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "is_recurring": {
+                    "type": "boolean"
+                },
+                "is_installment": {
+                    "type": "boolean"
+                },
+                "installment": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "category_id",
+                "type",
+                "amount",
+                "date"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "body"
+    ]
+}

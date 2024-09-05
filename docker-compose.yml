@@ -1,0 +1,22 @@
+networks:
+  shared-services:
+    external: true
+
+services:
+  opina-ai-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: opina-ai-api:latest
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - WATCH_FILES=${WATCH_FILES}
+      - DEBUG=${DEBUG}
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/go/app
+    network_mode: "host"
+
