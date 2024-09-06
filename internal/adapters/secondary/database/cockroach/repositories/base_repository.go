@@ -6,17 +6,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type BaseRepository struct {
+type BaseCockroachRepository struct {
 	Db *gorm.DB
 	Tx *gorm.DB
 }
 
-func BuildBaseRepository() *BaseRepository {
+func BuildBaseRepository() *BaseCockroachRepository {
 	db := cockroach_database.GetDB()
-	return &BaseRepository{Db: db, Tx: nil}
+	return &BaseCockroachRepository{Db: db, Tx: nil}
 }
 
-func (r *BaseRepository) getQueryOrTx() *gorm.DB {
+func (r *BaseCockroachRepository) getQueryOrTx() *gorm.DB {
 	if r.Tx != nil {
 		return r.Tx
 	}
@@ -24,7 +24,7 @@ func (r *BaseRepository) getQueryOrTx() *gorm.DB {
 	return r.Db
 }
 
-func (r *BaseRepository) StartTransaction() error {
+func (r *BaseCockroachRepository) StartTransaction() error {
 	// Note the use of tx as the database handle once you are within a transaction
 	tx := r.Db.Begin()
 	defer func() {
@@ -42,7 +42,7 @@ func (r *BaseRepository) StartTransaction() error {
 	return nil
 }
 
-func (r *BaseRepository) CommitTransaction() error {
+func (r *BaseCockroachRepository) CommitTransaction() error {
 	err := r.Tx.Commit().Error
 	r.Tx = nil
 	if err != nil {
@@ -51,7 +51,7 @@ func (r *BaseRepository) CommitTransaction() error {
 	return nil
 }
 
-func (r *BaseRepository) CancelTransaction() error {
+func (r *BaseCockroachRepository) CancelTransaction() error {
 	err := r.Tx.Rollback().Error
 	r.Tx = nil
 
@@ -62,6 +62,6 @@ func (r *BaseRepository) CancelTransaction() error {
 	return nil
 }
 
-func (r *BaseRepository) NextEntityID() string {
+func (r *BaseCockroachRepository) NextEntityID() string {
 	return uuid.NewV4().String()
 }

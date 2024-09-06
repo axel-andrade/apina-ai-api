@@ -7,35 +7,37 @@ import (
 	common_adapters "github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/common"
 	common_ptr "github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/presenters/common"
 	err_msg "github.com/axel-andrade/opina-ai-api/internal/core/domain/constants/errors"
-	create_content "github.com/axel-andrade/opina-ai-api/internal/core/usecases/content/create"
+	"github.com/axel-andrade/opina-ai-api/internal/core/usecases/voter/create_voter"
 )
 
-type CreateContentPresenter struct {
-	ContentPtr *common_ptr.ContentPresenter
+type CreateVoterPresenter struct {
+	VoterPtr *common_ptr.VoterPresenter
 }
 
-func BuildCreateContentPresenter() *CreateContentPresenter {
-	return &CreateContentPresenter{ContentPtr: common_ptr.BuildContentPresenter()}
+func BuildCreateVoterPresenter() *CreateVoterPresenter {
+	return &CreateVoterPresenter{VoterPtr: common_ptr.BuildVoterPresenter()}
 }
 
-func (p *CreateContentPresenter) Show(result *create_content.CreateContentOutput, err error) common_adapters.OutputPort {
+func (p *CreateVoterPresenter) Show(result *create_voter.CreateVoterOutput, err error) common_adapters.OutputPort {
 	if err != nil {
 		return p.formatError(err)
 	}
 
-	fc := p.ContentPtr.Format(result.Content)
+	fc := p.VoterPtr.Format(result.Voter)
 	data, _ := json.Marshal(fc)
 
 	return common_adapters.OutputPort{StatusCode: http.StatusCreated, Data: data}
 }
 
-func (p *CreateContentPresenter) formatError(err error) common_adapters.OutputPort {
+func (p *CreateVoterPresenter) formatError(err error) common_adapters.OutputPort {
 	errMsg := common_adapters.ErrorMessage{Message: err.Error()}
 	data, _ := json.Marshal(errMsg)
 
 	switch err.Error() {
-	case err_msg.NAME_IS_EMPTY, err_msg.DESCRIPTION_IS_EMPTY, err_msg.KIND_IS_EMPTY, err_msg.LANGUAGE_IS_EMPTY, err_msg.FILE_IS_EMPTY, err_msg.TEXT_IS_EMPTY:
+	case err_msg.CONTACT_FULL_NAME_REQUIRED, err_msg.CONTACT_CELLPHONE_REQUIRED, err_msg.INVALID_CELLPHONE:
 		return common_adapters.OutputPort{StatusCode: http.StatusBadRequest, Data: data}
+	case err_msg.VOTER_ALREADY_EXISTS:
+		return common_adapters.OutputPort{StatusCode: http.StatusConflict, Data: data}
 	default:
 		errMsg.Message = err_msg.INTERNAL_SERVER_ERROR
 		data, _ = json.Marshal(errMsg)

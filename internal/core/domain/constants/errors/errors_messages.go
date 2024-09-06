@@ -23,4 +23,5 @@ const (
 	CONTACT_FULL_NAME_REQUIRED = "full name is required"
 	CONTACT_CELLPHONE_REQUIRED = "cellphone is required"
 	INVALID_CELLPHONE          = "The cellphone number should be in the format +55 11 99999-9999"
+	VOTER_ALREADY_EXISTS       = "voter already exists"
 )

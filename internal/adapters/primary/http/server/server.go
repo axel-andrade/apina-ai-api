@@ -41,7 +41,6 @@ func (s *Server) AddRoutes(d *infra.Dependencies) {
 func (s *Server) Run() {
 	log.Printf("Server starting on port %s", s.port)
 
-	// Adiciona middlewares padrão
 	handler := middlewares.Gzip(s.server.Handler)
 	handler = middlewares.Cors(handler)
 	handler = middlewares.RequestID(handler)

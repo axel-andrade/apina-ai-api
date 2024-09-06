@@ -5,30 +5,23 @@ import (
 	"github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/controllers"
 	"github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/presenters"
 	common_ptr "github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/presenters/common"
-	mongo_repositories "github.com/axel-andrade/opina-ai-api/internal/adapters/secondary/database/mongo/repositories"
-	create_content "github.com/axel-andrade/opina-ai-api/internal/core/usecases/content/create"
-	"github.com/axel-andrade/opina-ai-api/internal/core/usecases/content/process_audio"
+	cockroach_repositories "github.com/axel-andrade/opina-ai-api/internal/adapters/secondary/database/cockroach/repositories"
+	"github.com/axel-andrade/opina-ai-api/internal/core/usecases/voter/create_voter"
 )
 
 type Dependencies struct {
-	BaseMongoRepository    *mongo_repositories.BaseMongoRepository
-	ContentMongoRepository *mongo_repositories.ContentMongoRepository
+	BaseCockroachRepository  *cockroach_repositories.BaseCockroachRepository
+	VoterCockroachRepositoty *cockroach_repositories.VoterCockroachRepository
 
 	EncrypterHandler    *handlers.EncrypterHandler
 	TokenManagerHandler *handlers.TokenManagerHandler
-	FileHandler         *handlers.FileHandler
-	DeepSpeechHandler   *handlers.DeepSpeechHandler
-	LanguageToolHandler *handlers.LanguageToolHandler
 
-	CreateContentController *controllers.CreateContentController
-	ProcessAudioController  *controllers.ProcessAudioController
+	CreateVoterController *controllers.CreateVoterController
 
-	CreateContentUC *create_content.CreateContentUC
-	ProcessAudioUC  *process_audio.ProcessAudioUC
+	CreateVoterUC *create_voter.CreateVoterUC
 
-	PaginationPresenter    *common_ptr.PaginationPresenter
-	CreateContentPresenter *presenters.CreateContentPresenter
-	ProcessAudioPresenter  *presenters.ProcessAudioPresenter
+	PaginationPresenter  *common_ptr.PaginationPresenter
+	CreateVoterPresenter *presenters.CreateVoterPresenter
 }
 
 func LoadDependencies() *Dependencies {
@@ -44,37 +37,25 @@ func LoadDependencies() *Dependencies {
 }
 
 func loadRepositories(d *Dependencies) {
-	d.ContentMongoRepository = mongo_repositories.BuildContentMongoRepository()
+	d.VoterCockroachRepositoty = cockroach_repositories.BuildVoterRepository()
 }
 
 func loadHandlers(d *Dependencies) {
 	d.EncrypterHandler = handlers.BuildEncrypterHandler()
 	d.TokenManagerHandler = handlers.BuildTokenManagerHandler()
-	d.FileHandler = handlers.BuildFileHandler()
-	d.DeepSpeechHandler = handlers.BuildDeepSpeechHandler()
-	d.LanguageToolHandler = handlers.BuildLanguageToolHandler()
 }
 
 func loadPresenters(d *Dependencies) {
 	d.PaginationPresenter = common_ptr.BuildPaginationPresenter()
-	d.CreateContentPresenter = presenters.BuildCreateContentPresenter()
-	d.ProcessAudioPresenter = presenters.BuildProcessAudioPresenter()
+	d.CreateVoterPresenter = presenters.BuildCreateVoterPresenter()
 }
 
 func loadUseCases(d *Dependencies) {
-	d.CreateContentUC = create_content.BuildCreateContentUC(struct {
-		*mongo_repositories.ContentMongoRepository
-		*handlers.FileHandler
-	}{d.ContentMongoRepository, d.FileHandler})
-
-	d.ProcessAudioUC = process_audio.BuildProcessAudioUC(struct {
-		*mongo_repositories.ContentMongoRepository
-		*handlers.DeepSpeechHandler
-		*handlers.LanguageToolHandler
-	}{d.ContentMongoRepository, d.DeepSpeechHandler, d.LanguageToolHandler})
+	d.CreateVoterUC = create_voter.BuildCreateVoterUC(struct {
+		*cockroach_repositories.VoterCockroachRepository
+	}{d.VoterCockroachRepositoty})
 }
 
 func loadControllers(d *Dependencies) {
-	d.CreateContentController = controllers.BuildCreateContentController(d.CreateContentUC, d.CreateContentPresenter)
-	d.ProcessAudioController = controllers.BuildProcessAudioController(d.ProcessAudioUC, d.ProcessAudioPresenter)
+	d.CreateVoterController = controllers.BuildCreateVoterController(d.CreateVoterUC, d.CreateVoterPresenter)
 }
