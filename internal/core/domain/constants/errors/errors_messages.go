@@ -20,8 +20,8 @@ const (
 	CONTENT_ALREADY_PROCESSED  = "content already processed"
 	UNAUTHORIZED               = "unauthorized"
 	INTERNAL_SERVER_ERROR      = "internal server error"
-	CONTACT_FULL_NAME_REQUIRED = "full name is required"
-	CONTACT_CELLPHONE_REQUIRED = "cellphone is required"
-	INVALID_CELLPHONE          = "The cellphone number should be in the format +55 11 99999-9999"
+	CONTACT_FULL_NAME_REQUIRED = "the full_name field is required"
+	CONTACT_CELLPHONE_REQUIRED = "the cellphone field is required"
+	INVALID_CELLPHONE          = "the cellphone field should be in the format 5511999999999"
 	VOTER_ALREADY_EXISTS       = "voter already exists"
 )

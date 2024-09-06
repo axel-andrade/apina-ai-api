@@ -17,20 +17,21 @@ func BuildCreateVoterUC(g CreateVoterGateway) *CreateVoterUC {
 }
 
 func (bs *CreateVoterUC) Execute(input CreateVoterInput) (*CreateVoterOutput, error) {
-	log.Printf("Checking if voter exists")
-	if exists, err := bs.Gateway.ExistsVoter(input.Cellphone); err != nil {
-		return nil, err
-	} else if exists {
-		return nil, fmt.Errorf(err_msg.VOTER_ALREADY_EXISTS)
-	}
-
-	log.Println("Creating content")
+	log.Println("Building voter")
 	voter, err := domain.BuildNewVoter(input.FullName, input.Cellphone)
 
 	if err != nil {
 		return nil, err
 	}
 
+	log.Printf("Checking if voter exists")
+	if exists, err := bs.Gateway.ExistsVoter(voter.Cellphone); err != nil {
+		return nil, err
+	} else if exists {
+		return nil, fmt.Errorf(err_msg.VOTER_ALREADY_EXISTS)
+	}
+
+	log.Printf("Creating voter")
 	result, err := bs.Gateway.CreateVoter(voter)
 
 	if err != nil {

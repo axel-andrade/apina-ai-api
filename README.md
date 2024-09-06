@@ -209,6 +209,7 @@ Don't confuse the project level `/src` directory with the `/src` directory Go us
 
 A more opinionated project template with sample/reusable configs, scripts and code is a WIP.
 
+sudo kill -9 `sudo lsof -t -i:9001`
 docker build -t opina-ai-api .
 docker run -it --rm -p 8080:8080 -v /home/axel15/Documents/playground/go-audio:/app/audio golang-deepspeech-server
 

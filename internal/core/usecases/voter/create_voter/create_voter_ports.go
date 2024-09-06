@@ -10,8 +10,8 @@ type CreateVoterGateway interface {
 }
 
 type CreateVoterInput struct {
-	FullName  string
-	Cellphone string
+	FullName  string `json:"full_name"`
+	Cellphone string `json:"cellphone"`
 }
 
 type CreateVoterOutput struct {

@@ -1,7 +1,7 @@
 package cockroach_migrations
 
 import (
-	"fmt"
+	"log"
 
 	cockroach_models "github.com/axel-andrade/opina-ai-api/internal/adapters/secondary/database/cockroach/models"
 	"gorm.io/gorm"
@@ -12,8 +12,7 @@ func MigrateCreateVoterTable(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&cockroach_models.VoterModel{}); err != nil {
 			return err
 		}
-
-		fmt.Println("Migration executed: 1683385982286_create_expenses")
+		log.Printf("Migration executed: 20240904205730_create_voters_table")
 	}
 
 	return nil

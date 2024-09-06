@@ -27,13 +27,13 @@ func BuildNewVoter(fullName, cellphone string) (*Voter, error) {
 }
 
 func isValidPhoneNumber(phone string) bool {
-	// The expression below accepts phone numbers in the format +55 11 99999-9999
-	// Accepts +55 (or other country codes), followed by numbers
-	phoneRegex := `^\+\d{1,3}\s\d{10,15}$`
+	// Regex para aceitar apenas números com código do país, código de área e número, sem o "+"
+	// Exemplo de números aceitos: 5511912345678, 123456789012345
+	phoneRegex := `^\d{1,3}\d{1,4}\d{6,10}$`
 	re := regexp.MustCompile(phoneRegex)
+
 	return re.MatchString(phone)
 }
-
 func (v *Voter) validate() error {
 	if v.FullName == "" {
 		return fmt.Errorf(err_msg.CONTACT_FULL_NAME_REQUIRED)
