@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/server"
-	mongo_database "github.com/axel-andrade/opina-ai-api/internal/adapters/secondary/database/mongo"
+	cockroach_database "github.com/axel-andrade/opina-ai-api/internal/adapters/secondary/database/cockroach"
 	"github.com/axel-andrade/opina-ai-api/internal/infra"
 	"github.com/joho/godotenv"
 )
@@ -22,7 +22,7 @@ func init() {
 		}
 	}
 
-	mongo_database.ConnectDB()
+	cockroach_database.ConnectDB()
 }
 
 func main() {

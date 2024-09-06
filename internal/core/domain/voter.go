@@ -7,23 +7,23 @@ import (
 	err_msg "github.com/axel-andrade/opina-ai-api/internal/core/domain/constants/errors"
 )
 
-type Contact struct {
+type Voter struct {
 	Base
 	FullName  string `json:"full_name"`
 	Cellphone string `json:"cellphone"`
 }
 
-func BuildNewContact(fullName, cellphone string) (*Contact, error) {
-	c := &Contact{
+func BuildNewVoter(fullName, cellphone string) (*Voter, error) {
+	v := &Voter{
 		FullName:  fullName,
 		Cellphone: cellphone,
 	}
 
-	if err := c.validate(); err != nil {
+	if err := v.validate(); err != nil {
 		return nil, err
 	}
 
-	return c, nil
+	return v, nil
 }
 
 func isValidPhoneNumber(phone string) bool {
@@ -34,16 +34,16 @@ func isValidPhoneNumber(phone string) bool {
 	return re.MatchString(phone)
 }
 
-func (c *Contact) validate() error {
-	if c.FullName == "" {
+func (v *Voter) validate() error {
+	if v.FullName == "" {
 		return fmt.Errorf(err_msg.CONTACT_FULL_NAME_REQUIRED)
 	}
 
-	if c.Cellphone == "" {
+	if v.Cellphone == "" {
 		return fmt.Errorf(err_msg.CONTACT_CELLPHONE_REQUIRED)
 	}
 
-	if !isValidPhoneNumber(c.Cellphone) {
+	if !isValidPhoneNumber(v.Cellphone) {
 		return fmt.Errorf(err_msg.INVALID_CELLPHONE)
 	}
 
