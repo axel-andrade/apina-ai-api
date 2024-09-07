@@ -1,17 +1,13 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/axel-andrade/opina-ai-api/internal/infra"
+	"github.com/gin-gonic/gin"
 )
 
-func createVoterHandler(d *infra.Dependencies) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			d.CreateVoterController.Handle(w, r)
-			return
-		}
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+func configureVoterRoutes(r *gin.RouterGroup, d *infra.Dependencies) {
+	voters := r.Group("voters")
+	{
+		voters.GET("/", d.CreateVoterController.Handle)
 	}
 }

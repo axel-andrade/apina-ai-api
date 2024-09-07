@@ -1,14 +1,25 @@
 package routes
 
 import (
-	"net/http"
-
+	"github.com/axel-andrade/opina-ai-api/docs"
 	"github.com/axel-andrade/opina-ai-api/internal/infra"
+	"github.com/gin-gonic/gin"
 )
 
-func ConfigRoutes(mux *http.ServeMux, d *infra.Dependencies) {
-	mux.HandleFunc("/healthcheck", healthcheckHandler)
-	mux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("path/to/swagger/files"))))
+func ConfigRoutes(r *gin.Engine, d *infra.Dependencies) *gin.Engine {
+	// programmatically set swagger info
+	docs.SwaggerInfo.Title = "Swagger Swapp API"
+	docs.SwaggerInfo.Description = "This is a sample server"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "swagg.swagger.io"
+	docs.SwaggerInfo.BasePath = "/v2"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
-	mux.HandleFunc("/api/v1/voters", createVoterHandler(d))
+	main := r.Group("/")
+	configureDefaultRoutes(main)
+
+	v1 := r.Group("api/v1")
+	configureVoterRoutes(v1, d)
+
+	return r
 }

@@ -1,11 +1,18 @@
 package routes
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "OK"})
+func configureDefaultRoutes(r *gin.RouterGroup) {
+	main := r.Group("/")
+	{
+		main.GET("/healthcheck", func(c *gin.Context) {
+			c.JSON(200, gin.H{"status": "OK"})
+		})
+
+		main.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 }
