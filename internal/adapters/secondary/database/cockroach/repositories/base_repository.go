@@ -11,7 +11,7 @@ type BaseCockroachRepository struct {
 	Tx *gorm.DB
 }
 
-func BuildBaseRepository() *BaseCockroachRepository {
+func BuildCockroachBaseRepository() *BaseCockroachRepository {
 	db := cockroach_database.GetDB()
 	return &BaseCockroachRepository{Db: db, Tx: nil}
 }

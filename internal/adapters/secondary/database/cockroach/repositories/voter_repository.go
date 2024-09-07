@@ -10,8 +10,8 @@ type VoterCockroachRepository struct {
 	VoterMapper cockroach_mappers.VoterMapper
 }
 
-func BuildVoterRepository() *VoterCockroachRepository {
-	return &VoterCockroachRepository{BaseCockroachRepository: BuildBaseRepository()}
+func BuildCockroachVoterRepository() *VoterCockroachRepository {
+	return &VoterCockroachRepository{BaseCockroachRepository: BuildCockroachBaseRepository()}
 }
 
 func (r *VoterCockroachRepository) ExistsVoter(cellphone string) (bool, error) {
