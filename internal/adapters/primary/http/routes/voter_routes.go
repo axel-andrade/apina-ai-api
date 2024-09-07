@@ -8,6 +8,6 @@ import (
 func configureVoterRoutes(r *gin.RouterGroup, d *infra.Dependencies) {
 	voters := r.Group("voters")
 	{
-		voters.GET("/", d.CreateVoterController.Handle)
+		voters.POST("/", d.CreateVoterController.Handle)
 	}
 }

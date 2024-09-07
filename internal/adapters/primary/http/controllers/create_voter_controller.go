@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/axel-andrade/opina-ai-api/internal/adapters/primary/http/presenters"
 	"github.com/axel-andrade/opina-ai-api/internal/core/usecases/voter/create_voter"
 	"github.com/gin-gonic/gin"
@@ -24,10 +26,11 @@ func BuildCreateVoterController(uc *create_voter.CreateVoterUC, ptr *presenters.
 // @Success		201		{object}	common_ptr.VoterFormatted
 // @Router			/api/v1/voters [post]
 func (ctrl *CreateVoterController) Handle(c *gin.Context) {
-	inputMap := c.MustGet("body").(map[string]any)
-	input := create_voter.CreateVoterInput{
-		FullName:  inputMap["full_name"].(string),
-		Cellphone: inputMap["cellphone"].(string),
+	var input create_voter.CreateVoterInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
 	}
 
 	result, err := ctrl.Usecase.Execute(input)

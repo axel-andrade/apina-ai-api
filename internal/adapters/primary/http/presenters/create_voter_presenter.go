@@ -31,16 +31,13 @@ func (p *CreateVoterPresenter) Show(result *create_voter.CreateVoterOutput, err 
 
 func (p *CreateVoterPresenter) formatError(err error) common_adapters.OutputPort {
 	errMsg := common_adapters.ErrorMessage{Message: err.Error()}
-	data, _ := json.Marshal(errMsg)
 
 	switch err.Error() {
 	case err_msg.CONTACT_FULL_NAME_REQUIRED, err_msg.CONTACT_CELLPHONE_REQUIRED, err_msg.INVALID_CELLPHONE:
-		return common_adapters.OutputPort{StatusCode: http.StatusBadRequest, Data: data}
+		return common_adapters.OutputPort{StatusCode: http.StatusBadRequest, Data: errMsg}
 	case err_msg.VOTER_ALREADY_EXISTS:
-		return common_adapters.OutputPort{StatusCode: http.StatusConflict, Data: data}
+		return common_adapters.OutputPort{StatusCode: http.StatusConflict, Data: errMsg}
 	default:
-		errMsg.Message = err_msg.INTERNAL_SERVER_ERROR
-		data, _ = json.Marshal(errMsg)
-		return common_adapters.OutputPort{StatusCode: http.StatusBadRequest, Data: data}
+		return common_adapters.OutputPort{StatusCode: http.StatusBadRequest, Data: common_adapters.ErrorMessage{Message: err_msg.INTERNAL_SERVER_ERROR}}
 	}
 }

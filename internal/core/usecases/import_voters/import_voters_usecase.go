@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
-	"sync"
 
 	"github.com/axel-andrade/opina-ai-api/internal/core/domain"
 	err_msg "github.com/axel-andrade/opina-ai-api/internal/core/domain/constants/errors"
@@ -19,71 +18,71 @@ func BuildImportVotersUC(g ImportVotersGateway) *ImportVotersUC {
 	return &ImportVotersUC{g}
 }
 
-func (bs *ImportVotersUC) Execute(input ImportVotersInput) error {
-	log.Println("Importing voters")
-
-	// Use a wait group to wait for the goroutine to finish
-	var wg sync.WaitGroup
-	var err error
-	// Buffered channel to hold the error
-	errChan := make(chan error, 1)
-
-	// Start a goroutine to execute the import
-	wg.Add(1)
-	go func() {
-		// Defer the wait group to be marked as done when the goroutine finishes
-		defer wg.Done()
-
-		log.Println("Parsing CSV to domain")
-		voters, parseErr := bs.parseCSVToDomain(input.Data)
-		if parseErr != nil {
-			errChan <- parseErr
-			return
-		}
-
-		log.Println("Getting voters by cellphones")
-		var votersCellphones []string
-
-		for _, voter := range voters {
-			votersCellphones = append(votersCellphones, voter.Cellphone)
-		}
-
-		log.Println("Checking existing voters")
-		existingVoters, _ := bs.Gateway.GetVotersByCellphones(votersCellphones)
-		existingVotersMap := make(map[string]*domain.Voter)
-
-		for _, voter := range existingVoters {
-			existingVotersMap[voter.Cellphone] = voter
-		}
-
-		var votersToCreate []*domain.Voter
-
-		for _, voter := range voters {
-			if _, exists := existingVotersMap[voter.Cellphone]; !exists {
-				votersToCreate = append(votersToCreate, voter)
-			}
-		}
-
-		if len(votersToCreate) == 0 {
-			log.Println("No voters to create")
-			return
-		}
-
-		log.Println("Creating voters")
-		if createErr := bs.Gateway.CreateVoters(votersToCreate); createErr != nil {
-			errChan <- createErr
-		}
-	}()
-
-	wg.Wait()
-	close(errChan)
-
-	// Check if there was an error during the goroutine execution
-	if err = <-errChan; err != nil {
-		return err
+func (bs *ImportVotersUC) Execute(input ImportVotersInput) (*ImportVotersOutput, error) {
+	log.Println("Creating import")
+	createdImport, err := bs.Gateway.CreateImport(&domain.Import{
+		UserID:   input.UserID,
+		Filename: "voters.csv",
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	// Retorne imediatamente com o ID da importação
+	go bs.processImport(createdImport, input.Data)
+
+	return &ImportVotersOutput{Import: createdImport}, nil
+}
+
+func (bs *ImportVotersUC) processImport(createdImport *domain.Import, data []byte) {
+	log.Println("Importing voters")
+	var votersToCreate []*domain.Voter
+
+	// Processamento existente movido para esta função
+	voters, err := bs.parseCSVToDomain(data)
+	if err != nil {
+		log.Println("Error parsing CSV:", err)
+		bs.updateImportError(createdImport, err)
+		return
+	}
+
+	// Processamento de checagem de eleitores existentes
+	var votersCellphones []string
+	for _, voter := range voters {
+		votersCellphones = append(votersCellphones, voter.Cellphone)
+	}
+
+	existingVoters, _ := bs.Gateway.GetVotersByCellphones(votersCellphones)
+	existingVotersMap := make(map[string]*domain.Voter)
+
+	for _, voter := range existingVoters {
+		existingVotersMap[voter.Cellphone] = voter
+	}
+
+	for _, voter := range voters {
+		if _, exists := existingVotersMap[voter.Cellphone]; !exists {
+			votersToCreate = append(votersToCreate, voter)
+		}
+	}
+
+	if len(votersToCreate) > 0 {
+		if err := bs.Gateway.CreateVoters(votersToCreate); err != nil {
+			bs.updateImportError(createdImport, err)
+			return
+		}
+	}
+
+	createdImport.TotalRecords = len(votersToCreate)
+	createdImport.Status = domain.ImportStatusCompleted
+
+	log.Println("Updating import")
+	bs.Gateway.UpdateImport(createdImport)
+}
+
+func (bs *ImportVotersUC) updateImportError(createdImport *domain.Import, err error) {
+	createdImport.Status = domain.ImportStatusError
+	createdImport.ErrorMessage = err.Error()
+	bs.Gateway.UpdateImport(createdImport)
 }
 
 func (bs *ImportVotersUC) parseCSVToDomain(data []byte) ([]*domain.Voter, error) {
