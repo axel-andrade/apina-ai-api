@@ -14,7 +14,6 @@ func (i *ImportMapper) ToDomain(model cockroach_models.ImportModel) *domain.Impo
 		Base:         *i.BaseMapper.toDomain(model.BaseModel),
 		UserID:       model.UserID,
 		Filename:     model.Filename,
-		Description:  model.Description,
 		Status:       model.Status,
 		TotalRecords: model.TotalRecords,
 		ErrorMessage: model.ErrorMessage,
@@ -26,7 +25,6 @@ func (i *ImportMapper) ToPersistence(e domain.Import) *cockroach_models.ImportMo
 		BaseModel:    *i.BaseMapper.toPersistence(e.Base),
 		UserID:       e.UserID,
 		Filename:     e.Filename,
-		Description:  e.Description,
 		Status:       e.Status,
 		TotalRecords: e.TotalRecords,
 		ErrorMessage: e.ErrorMessage,
@@ -42,10 +40,6 @@ func (i *ImportMapper) ToUpdate(model cockroach_models.ImportModel, e domain.Imp
 		model.Filename = e.Filename
 	}
 
-	if e.Description != "" {
-		model.Description = e.Description
-	}
-
 	if e.Status != "" {
 		model.Status = e.Status
 	}
@@ -54,7 +48,7 @@ func (i *ImportMapper) ToUpdate(model cockroach_models.ImportModel, e domain.Imp
 		model.TotalRecords = e.TotalRecords
 	}
 
-	if e.ErrorMessage != nil {
+	if e.ErrorMessage != "" {
 		model.ErrorMessage = e.ErrorMessage
 	}
 

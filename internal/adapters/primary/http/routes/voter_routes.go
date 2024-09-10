@@ -9,5 +9,6 @@ func configureVoterRoutes(r *gin.RouterGroup, d *infra.Dependencies) {
 	voters := r.Group("voters")
 	{
 		voters.POST("/", d.CreateVoterController.Handle)
+		voters.POST("/import", d.ImportVotersController.Handle)
 	}
 }

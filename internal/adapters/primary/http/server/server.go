@@ -24,6 +24,7 @@ type Server struct {
 // NewServer cria e retorna uma nova instância do servidor Gin com configurações padrão de middleware.
 func NewServer(port string) Server {
 	r := gin.New()
+	r.MaxMultipartMemory = 20 << 20 // 20 MiB
 
 	// Adiciona middlewares padrão
 	// gzip: Comprime as respostas HTTP com GZIP.

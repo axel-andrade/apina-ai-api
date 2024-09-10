@@ -17,13 +17,15 @@ type Dependencies struct {
 
 	EncrypterHandler *handlers.EncrypterHandler
 
-	CreateVoterController *controllers.CreateVoterController
+	CreateVoterController  *controllers.CreateVoterController
+	ImportVotersController *controllers.ImportVotersController
 
 	CreateVoterUC  *create_voter.CreateVoterUC
 	ImportVotersUC *import_voters.ImportVotersUC
 
-	PaginationPresenter  *common_ptr.PaginationPresenter
-	CreateVoterPresenter *presenters.CreateVoterPresenter
+	PaginationPresenter   *common_ptr.PaginationPresenter
+	CreateVoterPresenter  *presenters.CreateVoterPresenter
+	ImportVotersPresenter *presenters.ImportVotersPresenter
 }
 
 func LoadDependencies() *Dependencies {
@@ -50,6 +52,7 @@ func loadHandlers(d *Dependencies) {
 func loadPresenters(d *Dependencies) {
 	d.PaginationPresenter = common_ptr.BuildPaginationPresenter()
 	d.CreateVoterPresenter = presenters.BuildCreateVoterPresenter()
+	d.ImportVotersPresenter = presenters.BuildImportVotersPresenter()
 }
 
 func loadUseCases(d *Dependencies) {
@@ -57,11 +60,13 @@ func loadUseCases(d *Dependencies) {
 		*cockroach_repositories.VoterCockroachRepository
 	}{d.VoterCockroachRepositoty})
 
-	//	d.ImportVotersUC = import_voters.BuildImportVotersUC(struct {
-	//		*cockroach_repositories.ImportCockroachRepository
-	//	}{d.ImportCockroachRepository})
+	d.ImportVotersUC = import_voters.BuildImportVotersUC(struct {
+		*cockroach_repositories.VoterCockroachRepository
+		*cockroach_repositories.ImportCockroachRepository
+	}{d.VoterCockroachRepositoty, d.ImportCockroachRepository})
 }
 
 func loadControllers(d *Dependencies) {
 	d.CreateVoterController = controllers.BuildCreateVoterController(d.CreateVoterUC, d.CreateVoterPresenter)
+	d.ImportVotersController = controllers.BuildImportVotersController(d.ImportVotersUC, d.ImportVotersPresenter)
 }

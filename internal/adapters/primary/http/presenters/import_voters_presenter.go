@@ -20,7 +20,7 @@ func BuildImportVotersPresenter() *ImportVotersPresenter {
 
 func (p *ImportVotersPresenter) Show(result *import_voters.ImportVotersOutput, err error) common_adapters.OutputPort {
 	if err != nil {
-		return p.formatError(err)
+		return p.formatError()
 	}
 
 	fc := p.ImportPtr.Format(result.Import)
@@ -29,6 +29,6 @@ func (p *ImportVotersPresenter) Show(result *import_voters.ImportVotersOutput, e
 	return common_adapters.OutputPort{StatusCode: http.StatusAccepted, Data: data}
 }
 
-func (p *ImportVotersPresenter) formatError(err error) common_adapters.OutputPort {
+func (p *ImportVotersPresenter) formatError() common_adapters.OutputPort {
 	return common_adapters.OutputPort{StatusCode: http.StatusBadRequest, Data: common_adapters.ErrorMessage{Message: err_msg.INTERNAL_SERVER_ERROR}}
 }
